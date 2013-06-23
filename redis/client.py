@@ -2091,3 +2091,47 @@ class Lock(object):
         if existing >= self.acquired_until:
             self.redis.delete(self.name)
         self.acquired_until = None
+
+class Boostcache(StrictRedis):
+    RESPONSE_CALLBACKS = dict_merge(
+            StrictRedis.RESPONSE_CALLBACKS,
+            {
+            'HSET': lambda r: nativestr(r) == 'OK',
+            'ATSET': lambda r: nativestr(r) == 'OK',
+            }
+    )
+
+    def __init__(self, **kwargs):
+        super(Boostcache, self).__init__(**kwargs)
+
+    def hget(self, key):
+        "Return the value of ``key`` "
+        return self.execute_command('HGET', key)
+
+    def hset(self, key, value):
+        "Set the ``value`` of ``key`` "
+        return self.execute_command('HSET', key, value)
+
+    def hdel(self, key):
+        "Delete ``key``"
+        return self.execute_command('HDEL', key)
+
+    def atget(self, key):
+        "Return the value of ``key`` "
+        return self.execute_command('ATGET', key)
+
+    def atset(self, key, value):
+        "Set the ``value`` of ``key`` "
+        return self.execute_command('ATSET', key, value)
+
+    def atdel(self, key):
+        "Delete ``key``"
+        return self.execute_command('ATDEL', key)
+
+    def commands(self):
+        "Return list of commands" 
+        return self.execute_command('COMMANDS')
+
+    def version(self):
+        "Return version number" 
+        return self.execute_command('VERSION')

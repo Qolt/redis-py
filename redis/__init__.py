@@ -1,4 +1,4 @@
-from redis.client import Redis, StrictRedis
+from redis.client import Redis, StrictRedis, Boostcache
 from redis.connection import (
     BlockingConnectionPool,
     ConnectionPool,
@@ -23,7 +23,7 @@ __version__ = '2.7.6'
 VERSION = tuple(map(int, __version__.split('.')))
 
 __all__ = [
-    'Redis', 'StrictRedis', 'ConnectionPool', 'BlockingConnectionPool',
+    'Boostcache', 'Redis', 'StrictRedis', 'ConnectionPool', 'BlockingConnectionPool',
     'Connection', 'UnixDomainSocketConnection',
     'RedisError', 'ConnectionError', 'ResponseError', 'AuthenticationError',
     'InvalidResponse', 'DataError', 'PubSubError', 'WatchError', 'from_url',
