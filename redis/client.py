@@ -6,7 +6,7 @@ import warnings
 import time as mod_time
 from redis._compat import (b, izip, imap, iteritems, iterkeys, itervalues,
                            basestring, long, nativestr, urlparse, bytes)
-from redis.connection import ConnectionPool, UnixDomainSocketConnection
+from redis.connection import ConnectionPool, UnixDomainSocketConnection, Connection
 from redis.exceptions import (
     ConnectionError,
     DataError,
@@ -2103,6 +2103,22 @@ class Boostcache(StrictRedis):
 
     def __init__(self, **kwargs):
         super(Boostcache, self).__init__(**kwargs)
+
+    def execute_command(self, *args, **options):
+        "Execute a command and return a parsed response"
+        pool = self.connection_pool
+        command_name = args[0]
+        self.connection = pool.get_connection(command_name, **options)
+        try:
+            self.connection.send_command(*args)
+            return self.parse_response(self.connection, command_name, **options)
+        except ConnectionError:
+            self.connection.disconnect()
+            self.connection.send_command(*args)
+            return self.parse_response(self.connection, command_name, **options)
+        finally:
+            pool.release(self.connection)
+
 
     def hget(self, key):
         "Return the value of ``key`` "

@@ -5,3 +5,6 @@ dist/
 dump.rdb
 /.tox
 _build
+.swp
+.out
+pyprof
